@@ -8,7 +8,7 @@ __pycache__/
 *.so
 
 # data
-Inspiration/SindyPendulum/data
+Inspiration/SindyAutoencoderPendulum/data
 
 # Distribution / packaging
 .Python
