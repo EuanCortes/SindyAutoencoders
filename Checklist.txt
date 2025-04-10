@@ -1,0 +1,12 @@
+To do:
+
+1. Use Champion Lorenz data in Pendulum code 
+
+2. Increase dimensionality for prey-predator systerm
+
+3. Use prey-predator on Pendulum code
+
+
+Otherwise:
+
+Make our own SindyAutoencoder :(
