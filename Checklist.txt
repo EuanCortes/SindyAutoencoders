@@ -10,3 +10,88 @@ To do:
 Otherwise:
 
 Make our own SindyAutoencoder :(
+
+Updated To Do:
+
+1. Understand the Theory
+
+[ ] Review SINDy:
+    - What is Sparse Identification of Nonlinear Dynamics?
+    - How does it work (library of candidate functions, sparsity-promoting regression)?
+    - Strengths and limitations
+
+[ ] Understand Autoencoders:
+    - Role of encoder and decoder
+    - Latent space representations
+    - Loss functions (reconstruction error, possibly regularization)
+
+[ ] Understand the Combined Model (from Champion et al.):
+    - How the autoencoder maps data to a latent space
+    - How SINDy is applied in latent space
+    - Joint loss: reconstruction loss + SINDy loss
+    - Training process (backpropagating through SINDy)
+
+[ ] Mathematical Formulation:
+    - dot(z) = Θ(z) * ξ in latent space
+    - Total loss: L_recon + λ * L_SINDy
+
+
+2. Build a Visual Diagram / Cartoon
+
+[ ] Draw system architecture:
+    - Input → Encoder → Latent Variables → SINDy → dot(z)
+    - Latent Variables → Decoder → Reconstruction
+
+[ ] Include data flow and losses:
+    - Reconstruction loss (x vs x̂)
+    - SINDy loss in latent space (computed from finite differences or neural ODEs)
+
+3. Write the Code
+
+[ ] Prepare the Pipeline:
+    - Data simulation functions for Lorenz, Lotka-Volterra, Pendulum
+    - Time-derivative estimation (finite differences, smoothed derivatives, etc.)
+
+[ ] Autoencoder Model (PyTorch):
+    - Define encoder, decoder, and full AE
+
+[ ] SINDy Implementation:
+    - Build SINDy Model
+
+[ ] Combine and Train:
+    - Compute z = Encoder(x)
+    - Compute dot(z) from z
+    - Fit SINDy to (z, dot(z))
+    - Compute full loss: reconstruction + SINDy loss
+    - Backpropagate and update encoder/decoder
+
+[ ] Evaluate and Interpret Results:
+    - Compare original and reconstructed dynamics
+    - Inspect discovered equations in latent space
+    - Reproject to data space if needed
+
+
+4. Apply to Example Systems
+
+[ ] Lorenz System (3D chaotic):
+    - Generate data
+    - Train model
+    - Analyze latent variables & SINDy output
+
+[ ] Lotka-Volterra (2D nonlinear):
+    - Generate predator-prey dynamics
+    - Repeat pipeline
+
+[ ] Nonlinear Pendulum (1D or higher, video?):
+    - Simulate using physics or equations
+    - Test framework
+
+
+5. Final Evaluation & Visualization
+
+[ ] Plot latent space trajectories
+[ ] Plot learned dynamics vs ground truth
+[ ] Show reconstruction accuracy
+[ ] Display learned equations from SINDy
+[ ] Ablation: AE only vs AE+SINDy
+[ ] Optionally explore generalization
