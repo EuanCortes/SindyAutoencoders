@@ -145,7 +145,7 @@ def define_loss(outputs, data, params, refinement=False, return_losses=False):
         sindy_coefficients = outputs['coefficient_mask'] * outputs['sindy_coefficients']
     else:
         sindy_coefficients = outputs['sindy_coefficients']
-    losses['sindy_regularization'] = torch.mean(torch.abs(sindy_coefficients))
+    losses['sindy_regularization'] = torch.sum(torch.abs(sindy_coefficients))
     
     if refinement:
         loss = (params['loss_weight_decoder'] * losses['decoder'] +
