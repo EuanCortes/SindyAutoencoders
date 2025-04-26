@@ -32,7 +32,7 @@ def train_network(training_data, val_data, params):
     print('TRAINING')
     for epoch in range(params['max_epochs']):
         net.train()
-        
+    
         # Mini-batch training
         for batch_start in range(0, params['epoch_size'], params['batch_size']):
             batch_end = min(batch_start + params['batch_size'], params['epoch_size'])
@@ -47,25 +47,29 @@ def train_network(training_data, val_data, params):
             # Forward pass
             outputs = net(batch_data['x'])
             
-            # Compute loss
-            loss, losses = define_loss(outputs, batch_data, params)
+            # Compute loss with modified regularization
+            losses['sindy_regularization'] = torch.sum(torch.abs(outputs['sindy_coefficients']))
+            loss = (params['loss_weight_decoder'] * losses['decoder'] +
+                params['loss_weight_sindy_z'] * losses['sindy_z'] +
+                params['loss_weight_sindy_x'] * losses['sindy_x'] +
+                params['loss_weight_sindy_regularization'] * losses['sindy_regularization'])
             
-            # Backward pass and optimize
             optimizer.zero_grad()
             loss.backward()
             optimizer.step()
         
-        # Validation and printing
-        if params['print_progress'] and (epoch % params['print_frequency'] == 0):
-            validation_losses.append(print_progress(net, epoch, val_data, params, x_norm, sindy_predict_norm_x, device))
-        
-        # Sequential thresholding
-        if params['sequential_thresholding'] and (epoch % params['threshold_frequency'] == 0) and (epoch > 0):
+        # More frequent and aggressive thresholding
+        if params['sequential_thresholding'] and (epoch % 10 == 0) and (epoch > 0):
             with torch.no_grad():
-                coefficient_mask = (torch.abs(net.sindy_coefficients) > params['coefficient_threshold']).float()
+                # Gradually increase threshold
+                current_threshold = params['coefficient_threshold'] * min(1.0, epoch/params['max_epochs']*2)
+                coefficient_mask = (torch.abs(net.sindy_coefficients) > current_threshold).float()
+                
+                # Apply mask and zero out small coefficients
+                net.sindy_coefficients.data *= coefficient_mask
                 net.coefficient_mask = coefficient_mask.to(device)
-                print(f'THRESHOLDING: {int(torch.sum(coefficient_mask))} active coefficients')
-                sindy_model_terms.append(torch.sum(coefficient_mask).item())
+                
+                print(f'THRESHOLDING (threshold={current_threshold:.2e}): {int(torch.sum(coefficient_mask))} active coefficients')
     
     # Refinement phase
     print('REFINEMENT')
@@ -185,3 +189,34 @@ def print_progress(net, epoch, val_data, params, x_norm, sindy_predict_norm, dev
         print(f"decoder loss ratio: {decoder_loss_ratio}, decoder SINDy loss ratio: {decoder_sindy_loss_ratio}")
     
     return validation_losses
+
+def create_feed_dictionary(data, params, idxs=None):
+    """
+    Create the feed dictionary for passing into tensorflow.
+
+    Arguments:
+        data - Dictionary object containing the data to be passed in. Must contain input data x,
+        along the first (and possibly second) order time derivatives dx (ddx).
+        params - Dictionary object containing model and training parameters. The relevant
+        parameters are model_order (which determines whether the SINDy model predicts first or
+        second order time derivatives), sequential_thresholding (which indicates whether or not
+        coefficient thresholding is performed), coefficient_mask (optional if sequential
+        thresholding is performed; 0/1 mask that selects the relevant coefficients in the SINDy
+        model), and learning rate (float that determines the learning rate).
+        idxs - Optional array of indices that selects which examples from the dataset are passed
+        in to tensorflow. If None, all examples are used.
+
+    Returns:
+        feed_dict - Dictionary object containing the relevant data to pass to tensorflow.
+    """
+    if idxs is None:
+        idxs = np.arange(data['x'].shape[0])
+    feed_dict = {}
+    feed_dict['x:0'] = data['x'][idxs]
+    feed_dict['dx:0'] = data['dx'][idxs]
+    if params['model_order'] == 2:
+        feed_dict['ddx:0'] = data['ddx'][idxs]
+    if params['sequential_thresholding']:
+        feed_dict['coefficient_mask:0'] = params['coefficient_mask']
+    feed_dict['learning_rate:0'] = params['learning_rate']
+    return feed_dict
