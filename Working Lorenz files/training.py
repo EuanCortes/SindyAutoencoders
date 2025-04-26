@@ -59,7 +59,7 @@ def train_network(training_data, val_data, params):
             optimizer.step()
         
         # More frequent and aggressive thresholding
-        if params['sequential_thresholding'] and (epoch % 10 == 0) and (epoch > 0):
+        if params['sequential_thresholding'] and (epoch % params['threshold_frequency'] == 0) and (epoch > 0):
             with torch.no_grad():
                 # Gradually increase threshold
                 current_threshold = params['coefficient_threshold'] * min(1.0, epoch/params['max_epochs']*2)
