@@ -29,7 +29,7 @@ params['library_dim'] = library_size(params['latent_dim'], params['poly_order'],
 # sequential thresholding parameters
 params['sequential_thresholding'] = True
 params['coefficient_threshold'] = 0.1
-params['threshold_frequency'] = 500
+params['threshold_frequency'] = 250
 params['coefficient_mask'] = np.ones((params['library_dim'], params['latent_dim']))
 params['coefficient_initialization'] = 'constant'
 
@@ -52,8 +52,12 @@ params['print_progress'] = True
 params['print_frequency'] = 1
 
 # training time cutoffs
-params['max_epochs'] = 3
-params['refinement_epochs'] = 2
+params['max_epochs'] = 751
+params['refinement_epochs'] = 100
+
+# Set to GPU if available
+if torch.cuda.is_available():
+    params['device'] = 'cuda'
 
 num_experiments = 1
 df = pd.DataFrame()

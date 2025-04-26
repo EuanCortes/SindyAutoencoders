@@ -1,14 +1,15 @@
 #!/bin/sh
 ### General options
-#BSUB -q hpc
+#BSUB -q c02613
 #BSUB -J Lorenz_Training
 ####BSUB -J test
-#BSUB -n 16
+#BSUB -n 4
 #BSUB -R "span[hosts=1]"
-#BSUB -R "rusage[mem=16GB]"
-#BSUB -W 18:00
-#BSUB -o batch_output/Lorenz_CPU_%J.out
-#BSUB -e batch_output/Lorenz_CPU_%J.err
+#BSUB -R "rusage[mem=8GB]"
+#BSUB -gpu "num=1:mode=exclusive_process"
+#BSUB -W 02:00
+#BSUB -o batch_output/Lorenz_GPU_%J.out
+#BSUB -e batch_output/Lorenz_GPU_%J.err
 
 # Initialize Python environment
 source ../../../EEG\ Image\ Decoder/Phillip_Code/BCI/bin/activate
