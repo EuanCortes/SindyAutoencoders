@@ -48,11 +48,8 @@ def train_network(training_data, val_data, params):
             outputs = net(batch_data['x'])
             
             # Compute loss with modified regularization
-            losses['sindy_regularization'] = torch.sum(torch.abs(outputs['sindy_coefficients']))
-            loss = (params['loss_weight_decoder'] * losses['decoder'] +
-                params['loss_weight_sindy_z'] * losses['sindy_z'] +
-                params['loss_weight_sindy_x'] * losses['sindy_x'] +
-                params['loss_weight_sindy_regularization'] * losses['sindy_regularization'])
+            # Compute loss
+            loss, losses = define_loss(outputs, batch_data, params)
             
             optimizer.zero_grad()
             loss.backward()
