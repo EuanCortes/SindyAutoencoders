@@ -67,7 +67,7 @@ def train_network(training_data, val_data, params):
         if params['sequential_thresholding'] and (epoch % params['threshold_frequency'] == 0) and (epoch > 0):
             with torch.no_grad():
                 # Gradually increase threshold
-                current_threshold = params['coefficient_threshold'] * min(1.0, epoch/params['max_epochs']*2)
+                current_threshold = params['coefficient_threshold']
                 coefficient_mask = (torch.abs(net.sindy_coefficients) > current_threshold).float()
                 
                 # Apply mask and zero out small coefficients
