@@ -29,7 +29,7 @@ params['library_dim'] = library_size(params['latent_dim'], params['poly_order'],
 # sequential thresholding parameters
 params['sequential_thresholding'] = True
 params['coefficient_threshold'] = 0.1
-params['threshold_frequency'] = 250
+params['threshold_frequency'] = 300
 params['coefficient_mask'] = np.ones((params['library_dim'], params['latent_dim']))
 params['coefficient_initialization'] = 'constant'
 
@@ -52,8 +52,8 @@ params['print_progress'] = True
 params['print_frequency'] = 1
 
 # training time cutoffs
-params['max_epochs'] = 751
-params['refinement_epochs'] = 100
+params['max_epochs'] = 3001
+params['refinement_epochs'] = 500
 
 # Set to GPU if available
 if torch.cuda.is_available():
@@ -64,15 +64,14 @@ df = pd.DataFrame()
 print(f"Starting experiments, Number of epochs per experiment: {params['max_epochs']}, Number of experiments: {num_experiments}")
 for i in range(num_experiments):
     print('EXPERIMENT %d' % i)
-
+    date = datetime.datetime.now().strftime("%Y_%m_%d_%H_%M_%S_%f")
     # Reset any memory (mostly useful for GPU use)
     torch.cuda.empty_cache()
     gc.collect()
 
     # Update experiment-specific params
     params['coefficient_mask'] = np.ones((params['library_dim'], params['latent_dim']))
-    params['save_name'] = 'Results/lorenz_' + datetime.datetime.now().strftime("%Y_%m_%d_%H_%M_%S_%f")
-    date = datetime.datetime.now().strftime("%Y_%m_%d_%H_%M_%S_%f")
+    params['save_name'] = 'Results/lorenz_' + date
     # Train the model
     results_dict = train_network(training_data, validation_data, params)
 

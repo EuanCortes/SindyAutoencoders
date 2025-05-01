@@ -135,6 +135,7 @@ dmypy.json
 Data/
 *.out
 *.err
+.DS_Store
 *.DS_Store
 
 Inspiration/

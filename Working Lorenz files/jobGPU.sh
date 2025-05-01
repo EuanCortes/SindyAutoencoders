@@ -1,13 +1,13 @@
 #!/bin/sh
 ### General options
-#BSUB -q c02613
-#BSUB -J Lorenz_Training
+#BSUB -q gpuv100
+#BSUB -J Lorenz_Training_GPU
 ####BSUB -J test
 #BSUB -n 4
 #BSUB -R "span[hosts=1]"
 #BSUB -R "rusage[mem=8GB]"
 #BSUB -gpu "num=1:mode=exclusive_process"
-#BSUB -W 02:00
+#BSUB -W 24:00
 #BSUB -o batch_output/Lorenz_GPU_%J.out
 #BSUB -e batch_output/Lorenz_GPU_%J.err
 

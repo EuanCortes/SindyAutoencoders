@@ -6,7 +6,7 @@
 #BSUB -n 16
 #BSUB -R "span[hosts=1]"
 #BSUB -R "rusage[mem=16GB]"
-#BSUB -W 18:00
+#BSUB -W 71:00
 #BSUB -o batch_output/Lorenz_CPU_%J.out
 #BSUB -e batch_output/Lorenz_CPU_%J.err
 
