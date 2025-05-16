@@ -17,6 +17,20 @@ def train_network(training_data, val_data, params):
     # Initialize network
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     net = full_network(params).to(device)
+
+    # Load model if specified
+    if params.get('load_model'):
+        model_path = params['load_model']
+        net.load_state_dict(torch.load(model_path, map_location=device))
+        print(f"Loaded model from {model_path}")
+        
+        # Load training details if available
+        params_path = model_path.replace('.pt', '_params.pkl')
+        if os.path.exists(params_path):
+            loaded_params = pickle.load(open(params_path, 'rb'))
+            print(f"Model was trained with {loaded_params['max_epochs']} epochs and {loaded_params['refinement_epochs']} refinement epochs.")
+        else:
+            print("No parameter file found for the loaded model.")
     
     # Define optimizer
     optimizer = torch.optim.Adam(net.parameters(), lr=params['learning_rate'])
